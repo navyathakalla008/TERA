@@ -1,0 +1,490 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+ <meta charset="UTF-8">
+ <meta name="viewport" content="width=device-width, initial-scale=1.0">
+ <title>TERA - Measurements</title>
+ <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+ <style>
+ * {
+ margin: 0;
+ padding: 0;
+ box-sizing: border-box;
+ }
+ body {
+ background: #f5f5f5;
+ color: #333;
+ font-family: 'Orbitron', sans-serif;
+ transition: all 0.3s ease;
+ }
+ body.dark-theme {
+ background: #0d0d0d;
+ color: #fff;
+ }
+ .main-content {
+ padding: 20px;
+ margin-bottom: 80px;
+ margin-top: 60px;
+ max-width: 800px;
+ margin-left: auto;
+ margin-right: auto;
+ }
+ .measurements-form {
+ background: rgba(255, 255, 255, 0.95);
+ border-radius: 20px;
+ padding: 30px;
+ box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05);
+ backdrop-filter: blur(10px);
+ }
+ .dark-theme .measurements-form {
+ background: rgba(13, 13, 13, 0.95);
+ }
+ .form-title {
+ color: #00bcd4;
+ margin-bottom: 30px;
+ font-size: 1.8em;
+ text-align: center;
+ text-shadow: 0 0 10px rgba(0, 188, 212, 0.2);
+ }
+ .dark-theme .form-title {
+ color: #00ffff;
+ text-shadow: 0 0 10px rgba(0, 255, 255, 0.2);
+ }
+ .measurement-section {
+ margin-bottom: 40px;
+ padding: 25px;
+ background: rgba(255, 255, 255, 0.5);
+ border-radius: 15px;
+ border: 1px solid rgba(0, 188, 212, 0.1);
+ }
+ .dark-theme .measurement-section {
+ background: rgba(255, 255, 255, 0.05);
+ border-color: rgba(0, 255, 255, 0.1);
+ }
+ .section-title {
+ color: #00bcd4;
+ margin-bottom: 25px;
+ font-size: 1.3em;
+ text-shadow: 0 0 10px rgba(0, 188, 212, 0.2);
+ }
+ .dark-theme .section-title {
+ color: #00ffff;
+ text-shadow: 0 0 10px rgba(0, 255, 255, 0.2);
+ }
+ .form-group {
+ margin-bottom: 20px;
+ }
+ .form-group label {
+ display: block;
+ margin-bottom: 8px;
+ color: #666;
+ font-size: 0.95em;
+ }
+ .dark-theme .form-group label {
+ color: rgba(255, 255, 255, 0.7);
+ }
+ .form-group input {
+ width: 100%;
+ padding: 12px 15px;
+ border: 2px solid rgba(0, 188, 212, 0.2);
+ border-radius: 10px;
+ background: rgba(255, 255, 255, 0.8);
+ color: #333;
+ font-size: 1em;
+ transition: all 0.3s ease;
+ }
+ .dark-theme .form-group input {
+ background: rgba(255, 255, 255, 0.1);
+ border-color: rgba(0, 255, 255, 0.2);
+ color: #fff;
+ }
+ .form-group input:focus {
+ border-color: #00bcd4;
+ box-shadow: 0 0 15px rgba(0, 188, 212, 0.1);
+ outline: none;
+ }
+ .dark-theme .form-group input:focus {
+ border-color: #00ffff;
+ box-shadow: 0 0 15px rgba(0, 255, 255, 0.1);
+ }
+ .save-button {
+ background: linear-gradient(90deg, #00bcd4, #00e5ff);
+ border: none;
+ color: white;
+ padding: 15px 30px;
+ border-radius: 15px;
+ cursor: pointer;
+ transition: all 0.3s ease;
+ font-weight: bold;
+ width: 100%;
+ box-shadow: 0 5px 15px rgba(0, 188, 212, 0.2);
+ margin-top: 20px;
+ font-size: 1.1em;
+ }
+ .dark-theme .save-button {
+ background: linear-gradient(90deg, #00ffff, #00bcd4);
+ }
+ .save-button:hover {
+ transform: scale(1.02);
+ box-shadow: 0 8px 25px rgba(0, 188, 212, 0.3);
+ }
+ .measurement-grid {
+ display: grid;
+ grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+ gap: 30px;
+ padding: 10px;
+ }
+ .measurement-card {
+ background: rgba(255, 255, 255, 0.95);
+ border-radius: 20px;
+ padding: 30px;
+ transition: all 0.3s ease;
+ box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05);
+ backdrop-filter: blur(10px);
+ display: flex;
+ flex-direction: column;
+ gap: 20px;
+ }
+ .dark-theme .measurement-card {
+ background: rgba(13, 13, 13, 0.95);
+ }
+ .measurement-card:hover {
+ transform: translateY(-5px);
+ box-shadow: 0 15px 40px rgba(0, 188, 212, 0.15);
+ }
+ .measurement-header {
+ display: flex;
+ align-items: center;
+ gap: 15px;
+ margin-bottom: 10px;
+ }
+ .measurement-icon {
+ width: 60px;
+ height: 60px;
+ border-radius: 15px;
+ background: rgba(0, 188, 212, 0.1);
+ display: flex;
+ align-items: center;
+ justify-content: center;
+ font-size: 24px;
+ color: #00bcd4;
+ transition: all 0.3s ease;
+ }
+ .dark-theme .measurement-icon {
+ background: rgba(0, 255, 255, 0.1);
+ color: #00ffff;
+ }
+ .measurement-card:hover .measurement-icon {
+ transform: scale(1.1);
+ box-shadow: 0 0 20px rgba(0, 188, 212, 0.2);
+ }
+ .measurement-info {
+ flex-grow: 1;
+ }
+ .measurement-title {
+ color: #00bcd4;
+ font-size: 1.2em;
+ margin-bottom: 5px;
+ text-shadow: 0 0 10px rgba(0, 188, 212, 0.2);
+ }
+ .dark-theme .measurement-title {
+ color: #00ffff;
+ text-shadow: 0 0 10px rgba(0, 255, 255, 0.2);
+ }
+ .measurement-value {
+ color: #333;
+ font-size: 1.1em;
+ font-weight: bold;
+ }
+ .dark-theme .measurement-value {
+ color: #fff;
+ }
+ .measurement-input {
+ width: 100%;
+ padding: 12px 20px;
+ border: 2px solid rgba(0, 188, 212, 0.2);
+ border-radius: 15px;
+ background: rgba(255, 255, 255, 0.8);
+ color: #333;
+ font-size: 1em;
+ transition: all 0.3s ease;
+ }
+ .dark-theme .measurement-input {
+ background: rgba(255, 255, 255, 0.1);
+ border-color: rgba(0, 255, 255, 0.2);
+ color: #fff;
+ }
+ .measurement-input:focus {
+ border-color: #00bcd4;
+ box-shadow: 0 0 15px rgba(0, 188, 212, 0.1);
+ outline: none;
+ }
+ .dark-theme .measurement-input:focus {
+ border-color: #00ffff;
+ box-shadow: 0 0 15px rgba(0, 255, 255, 0.1);
+ }
+ .measurement-unit {
+ color: #666;
+ font-size: 0.9em;
+ margin-top: 5px;
+ }
+ .dark-theme .measurement-unit {
+ color: rgba(255, 255, 255, 0.7);
+ }
+ 
+ .footer-navbar {
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      width: 100%;
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.05);
+      display: flex;
+      justify-content: space-around;
+            padding: 10px 0;
+            color: #666;
+            transition: all 0.3s ease;
+        }
+        .dark-theme .footer-navbar {
+            background: rgba(13, 13, 13, 0.95);
+    }
+    .footer-item {
+      text-align: center;
+            color: #666;
+      text-decoration: none;
+            font-size: 14px;
+            position: relative;
+            transition: all 0.3s ease;
+        }
+        .dark-theme .footer-item {
+            color: rgba(255, 255, 255, 0.7);
+    }
+    .footer-item i {
+      display: block;
+            font-size: 20px;
+      margin-bottom: 3px;
+            transition: all 0.3s ease;
+        }
+        .footer-item:hover {
+            color: #00bcd4;
+        }
+        .dark-theme .footer-item:hover {
+            color: #00ffff;
+        }
+        .footer-item.active {
+            color: #00bcd4;
+        }
+        .dark-theme .footer-item.active {
+            color: #00ffff;
+        }
+        .category-navbar {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            padding: 15px;
+            background: rgba(255, 255, 255, 0.95);
+            margin-top: 70px;
+            position: sticky;
+            top: 70px;
+            z-index: 900;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+            backdrop-filter: blur(10px);
+  }
+ #fileUpload {
+ display: none;
+ }
+ .nav-icons {
+ display: flex;
+ align-items: center;
+ gap: 15px;
+ }
+ .theme-toggle {
+ background: none;
+ border: none;
+ color: #00bcd4;
+ font-size: 22px;
+ cursor: pointer;
+ padding: 8px;
+ border-radius: 50%;
+ transition: all 0.3s ease;
+ display: flex;
+ align-items: center;
+ justify-content: center;
+ }
+ .dark-theme .theme-toggle {
+ color: #00ffff;
+ }
+ .theme-toggle:hover {
+ transform: scale(1.1) rotate(5deg);
+ background: rgba(0, 188, 212, 0.1);
+ }
+ .dark-theme .theme-toggle:hover {
+ background: rgba(0, 255, 255, 0.1);
+ }
+ .theme-toggle i {
+ transition: all 0.3s ease;
+ }
+ .theme-toggle:hover i {
+ transform: rotate(180deg);
+ }
+ </style>
+</head>
+<body>
+ <div class="main-content">
+ <div class="measurements-form">
+ <h2 class="form-title">Body Measurements</h2>
+ 
+ <div class="measurement-section">
+ <h3 class="section-title">Basic Measurements</h3>
+ <div class="form-group">
+ <label>Height (cm)</label>
+ <input type="number" placeholder="Enter your height">
+ </div>
+ <div class="form-group">
+ <label>Weight (kg)</label>
+ <input type="number" placeholder="Enter your weight">
+ </div>
+ </div>
+
+ <div class="measurement-section">
+ <h3 class="section-title">Upper Body</h3>
+ <div class="form-group">
+ <label>Bust (cm)</label>
+ <input type="number" placeholder="Enter bust measurement">
+ </div>
+ <div class="form-group">
+ <label>Waist (cm)</label>
+ <input type="number" placeholder="Enter waist measurement">
+ </div>
+ <div class="form-group">
+ <label>Hip (cm)</label>
+ <input type="number" placeholder="Enter hip measurement">
+ </div>
+ <div class="form-group">
+ <label>Shoulder Width (cm)</label>
+ <input type="number" placeholder="Enter shoulder width">
+ </div>
+ <div class="form-group">
+ <label>Arm Length (cm)</label>
+ <input type="number" placeholder="Enter arm length">
+ </div>
+ </div>
+
+ <div class="measurement-section">
+ <h3 class="section-title">Lower Body</h3>
+ <div class="form-group">
+ <label>Inseam (cm)</label>
+ <input type="number" placeholder="Enter inseam length">
+ </div>
+ <div class="form-group">
+ <label>Thigh Circumference (cm)</label>
+ <input type="number" placeholder="Enter thigh circumference">
+ </div>
+ <div class="form-group">
+ <label>Knee Circumference (cm)</label>
+ <input type="number" placeholder="Enter knee circumference">
+ </div>
+ <div class="form-group">
+ <label>Ankle Circumference (cm)</label>
+ <input type="number" placeholder="Enter ankle circumference">
+ </div>
+ </div>
+
+ <button class="save-button" onclick="saveMeasurements()">Save Measurements</button>
+ </div>
+ </div>
+
+ <footer class="footer">
+    <nav class="footer-navbar">
+        <a href="index.html" class="footer-item"><i class="fas fa-home"></i><span>Home</span></a>
+        <a href="design.html" class="footer-item"><i class="fas fa-pencil-ruler"></i><span>Design</span></a>
+        <a href="measurements.html" class="footer-item active"><i class="fas fa-ruler"></i><span>Measurements</span></a>
+        <a href="tailors.html" class="footer-item"><i class="fas fa-user-tie"></i><span>Tailors</span></a>
+        <a href="orders.html" class="footer-item"><i class="fas fa-shopping-cart"></i><span>Orders</span></a>
+        <a href="accounts.html" class="footer-item"><i class="fas fa-user"></i><span>Profile</span></a>
+  </nav>
+ </footer>
+
+ <script>
+ function saveMeasurements() {
+ // Get all input values
+ const measurements = {};
+ document.querySelectorAll('.form-group input').forEach(input => {
+ measurements[input.previousElementSibling.textContent] = input.value;
+ });
+
+ // Save to localStorage
+ localStorage.setItem('userMeasurements', JSON.stringify(measurements));
+ alert('Measurements saved successfully!');
+ }
+
+ // Load saved measurements if they exist
+ window.onload = function() {
+ const savedMeasurements = localStorage.getItem('userMeasurements');
+ if (savedMeasurements) {
+ const measurements = JSON.parse(savedMeasurements);
+ document.querySelectorAll('.form-group input').forEach(input => {
+ const label = input.previousElementSibling.textContent;
+ if (measurements[label]) {
+ input.value = measurements[label];
+ }
+ });
+ }
+ };
+
+ // Toggle notifications dropdown
+ function toggleNotifications() {
+ const dropdown = document.getElementById('notificationDropdown');
+ dropdown.style.display = dropdown.style.display === 'block' ? 'none' : 'block';
+ }
+
+ // Close notifications when clicking outside
+ document.addEventListener('click', function(event) {
+ const dropdown = document.getElementById('notificationDropdown');
+ const bellIcon = document.querySelector('.fa-bell');
+ if (!bellIcon.contains(event.target) && !dropdown.contains(event.target)) {
+ dropdown.style.display = 'none';
+ }
+ });
+
+ // Handle file upload
+ document.getElementById('fileUpload').addEventListener('change', function(event) {
+ const file = event.target.files[0];
+ if (file) {
+ alert('Image uploaded successfully: ' + file.name);
+ // Here you would typically handle the image upload to your server
+ }
+ });
+
+ // Handle search
+ function searchTailors() {
+ const searchTerm = document.getElementById('searchInput').value;
+ alert('Searching for: ' + searchTerm);
+ // Here you would typically implement the search functionality
+ }
+
+ // Theme toggle functionality
+ const themeToggle = document.querySelector('.theme-toggle');
+ const body = document.body;
+ const themeIcon = themeToggle.querySelector('i');
+ 
+ // Check for saved theme preference
+ const savedTheme = localStorage.getItem('theme');
+ if (savedTheme === 'dark') {
+ body.classList.add('dark-theme');
+ themeIcon.classList.remove('fa-moon');
+ themeIcon.classList.add('fa-sun');
+ }
+
+ function toggleTheme() {
+ body.classList.toggle('dark-theme');
+ themeIcon.classList.toggle('fa-moon');
+ themeIcon.classList.toggle('fa-sun');
+ 
+ // Save theme preference
+ localStorage.setItem('theme', body.classList.contains('dark-theme') ? 'dark' : 'light');
+ }
+ </script>
+</body>
+</html>

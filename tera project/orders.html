@@ -1,0 +1,482 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TERA - Orders</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            background: #f5f5f5;
+            color: #333;
+            font-family: 'Orbitron', sans-serif;
+            transition: all 0.3s ease;
+        }
+        body.dark-theme {
+            background: #0d0d0d;
+            color: #fff;
+        }
+        .navbar {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            background: rgba(255, 255, 255, 0.95);
+            padding: 10px 20px;
+            color: #333;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            z-index: 1000;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+            backdrop-filter: blur(10px);
+        }
+        .dark-theme .navbar {
+            background: rgba(13, 13, 13, 0.95);
+            color: #fff;
+        }
+        .logo {
+            font-size: 22px;
+            font-weight: bold;
+            color: #00bcd4;
+            text-shadow: 0 0 10px rgba(0, 188, 212, 0.2);
+        }
+        .dark-theme .logo {
+            color: #00ffff;
+            text-shadow: 0 0 10px rgba(0, 255, 255, 0.2);
+        }
+        .search-bar {
+            flex: 1;
+            margin: 0 15px;
+            display: flex;
+            gap: 10px;
+        }
+        .search-bar input {
+            width: 100%;
+            padding: 8px;
+            border: none;
+            border-radius: 5px;
+            background: rgba(255, 255, 255, 0.8);
+            color: #333;
+        }
+        .dark-theme .search-bar input {
+            background: rgba(255, 255, 255, 0.1);
+            color: #fff;
+        }
+        .nav-icons {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+        .theme-toggle {
+            background: none;
+            border: none;
+            color: #00bcd4;
+            font-size: 22px;
+            cursor: pointer;
+            padding: 8px;
+            border-radius: 50%;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .dark-theme .theme-toggle {
+            color: #00ffff;
+        }
+        .theme-toggle:hover {
+            transform: scale(1.1) rotate(5deg);
+            background: rgba(0, 188, 212, 0.1);
+        }
+        .dark-theme .theme-toggle:hover {
+            background: rgba(0, 255, 255, 0.1);
+        }
+        .theme-toggle i {
+            transition: all 0.3s ease;
+        }
+        .theme-toggle:hover i {
+            transform: rotate(180deg);
+        }
+        .nav-icons i {
+            font-size: 20px;
+            cursor: pointer;
+            transition: 0.3s;
+            color: #666;
+        }
+        .dark-theme .nav-icons i {
+            color: rgba(255, 255, 255, 0.7);
+        }
+        .nav-icons i:hover {
+            color: #00bcd4;
+            transform: scale(1.1);
+        }
+        .dark-theme .nav-icons i:hover {
+            color: #00ffff;
+        }
+        .notification-badge {
+            position: absolute;
+            top: -5px;
+            right: -5px;
+            background: #ff00ff;
+            color: white;
+            border-radius: 50%;
+            padding: 2px 6px;
+            font-size: 12px;
+        }
+        .notification-dropdown {
+            display: none;
+            position: absolute;
+            top: 40px;
+            right: 0;
+            background: #333;
+            border-radius: 5px;
+            padding: 10px;
+            min-width: 200px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
+        }
+        .notification-item {
+            padding: 8px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        .notification-item:last-child {
+            border-bottom: none;
+        }
+        .main-content {
+            padding: 20px;
+            margin-bottom: 70px;
+            margin-top: 80px;
+            max-width: 1000px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+        .orders-container {
+            display: flex;
+            flex-direction: column;
+            gap: 30px;
+        }
+        .orders-container h2 {
+            color: #00bcd4;
+            margin-bottom: 30px;
+            text-align: center;
+            font-size: 1.8em;
+            text-shadow: 0 0 10px rgba(0, 188, 212, 0.2);
+        }
+        .dark-theme .orders-container h2 {
+            color: #00ffff;
+            text-shadow: 0 0 10px rgba(0, 255, 255, 0.2);
+        }
+        .order-card {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 20px;
+            padding: 30px;
+            transition: all 0.3s ease;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05);
+            backdrop-filter: blur(10px);
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+        .dark-theme .order-card {
+            background: rgba(13, 13, 13, 0.95);
+        }
+        .order-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 40px rgba(0, 188, 212, 0.15);
+        }
+        .order-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 15px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid rgba(0, 188, 212, 0.1);
+        }
+        .dark-theme .order-header {
+            border-bottom-color: rgba(0, 255, 255, 0.1);
+        }
+        .order-header h3 {
+            color: #00bcd4;
+            font-size: 1.2em;
+            text-shadow: 0 0 10px rgba(0, 188, 212, 0.2);
+        }
+        .dark-theme .order-header h3 {
+            color: #00ffff;
+            text-shadow: 0 0 10px rgba(0, 255, 255, 0.2);
+        }
+        .order-status {
+            padding: 5px 15px;
+            border-radius: 15px;
+            font-size: 0.9em;
+            font-weight: 500;
+            background: rgba(0, 188, 212, 0.1);
+            color: #00bcd4;
+            border: 1px solid rgba(0, 188, 212, 0.2);
+        }
+        .dark-theme .order-status {
+            background: rgba(0, 255, 255, 0.1);
+            color: #00ffff;
+            border-color: rgba(0, 255, 255, 0.2);
+        }
+        .order-details {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 20px;
+            padding: 20px;
+            background: rgba(255, 255, 255, 0.5);
+            border-radius: 15px;
+            margin: 10px 0;
+        }
+        .dark-theme .order-details {
+            background: rgba(255, 255, 255, 0.05);
+        }
+        .detail-item {
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+        }
+        .detail-label {
+            color: #666;
+            font-size: 0.9em;
+        }
+        .dark-theme .detail-label {
+            color: rgba(255, 255, 255, 0.7);
+        }
+        .detail-value {
+            color: #333;
+            font-weight: 500;
+        }
+        .dark-theme .detail-value {
+            color: #fff;
+        }
+        .order-actions {
+            display: flex;
+            gap: 15px;
+            margin-top: 15px;
+        }
+        .action-btn {
+            flex: 1;
+            padding: 12px 20px;
+            border-radius: 15px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-weight: bold;
+            text-align: center;
+            text-decoration: none;
+            color: white;
+        }
+        .track-btn {
+            background: linear-gradient(90deg, #00bcd4, #00e5ff);
+            box-shadow: 0 5px 15px rgba(0, 188, 212, 0.2);
+        }
+        .dark-theme .track-btn {
+            background: linear-gradient(90deg, #00ffff, #00bcd4);
+        }
+        .track-btn:hover {
+            transform: scale(1.02);
+            box-shadow: 0 8px 25px rgba(0, 188, 212, 0.3);
+        }
+        .cancel-btn {
+            background: linear-gradient(90deg, #ff6b6b, #ff8e8e);
+            box-shadow: 0 5px 15px rgba(255, 107, 107, 0.2);
+        }
+        .cancel-btn:hover {
+            transform: scale(1.02);
+            box-shadow: 0 8px 25px rgba(255, 107, 107, 0.3);
+        }
+        .footer-navbar {
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      width: 100%;
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.05);
+      display: flex;
+      justify-content: space-around;
+            padding: 10px 0;
+            color: #666;
+            transition: all 0.3s ease;
+        }
+        .dark-theme .footer-navbar {
+            background: rgba(13, 13, 13, 0.95);
+    }
+    .footer-item {
+      text-align: center;
+            color: #666;
+      text-decoration: none;
+            font-size: 14px;
+            position: relative;
+            transition: all 0.3s ease;
+        }
+        .dark-theme .footer-item {
+            color: rgba(255, 255, 255, 0.7);
+    }
+    .footer-item i {
+      display: block;
+            font-size: 20px;
+      margin-bottom: 3px;
+            transition: all 0.3s ease;
+        }
+        .footer-item:hover {
+            color: #00bcd4;
+        }
+        .dark-theme .footer-item:hover {
+            color: #00ffff;
+        }
+        .footer-item.active {
+            color: #00bcd4;
+        }
+        .dark-theme .footer-item.active {
+            color: #00ffff;
+        }
+        .category-navbar {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            padding: 15px;
+            background: rgba(255, 255, 255, 0.95);
+            margin-top: 70px;
+            position: sticky;
+            top: 70px;
+            z-index: 900;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+            backdrop-filter: blur(10px);
+  }
+        #fileUpload {
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar">
+        <div class="logo">TERA</div>
+        <div class="search-bar">
+            <input type="text" id="searchInput" placeholder="Search...">
+            <button onclick="search()"><i class="fas fa-search"></i></button>
+        </div>
+        <div class="nav-icons">
+            <button class="theme-toggle" onclick="toggleTheme()">
+                <i class="fas fa-moon"></i>
+            </button>
+            <i class="fas fa-bell" onclick="toggleNotifications()"></i>
+            <i class="fas fa-user"></i>
+        </div>
+    </nav>
+
+    <input type="file" id="fileUpload" accept="image/*">
+
+    <div class="main-content">
+        <div class="orders-container">
+            <h2 style="color: #00ffff; margin-bottom: 30px; text-align: center;">Your Orders</h2>
+            
+            <!-- Sample Order Card -->
+            <div class="order-card">
+                <div class="order-header">
+                    <h3>Order #12345</h3>
+                    <span class="order-status status-pending">Pending</span>
+                </div>
+                <div class="order-details">
+                    <p><strong>Design:</strong> Custom Evening Gown</p>
+                    <p><strong>Tailor:</strong> John's Tailoring</p>
+                    <p><strong>Order Date:</strong> March 15, 2024</p>
+                    <p><strong>Estimated Delivery:</strong> March 30, 2024</p>
+                    <p><strong>Price:</strong> $299.99</p>
+                </div>
+                <div class="order-actions">
+                    <button class="btn">View Details</button>
+                    <button class="btn">Track Order</button>
+                    <button class="btn">Contact Tailor</button>
+                </div>
+            </div>
+
+            <!-- Another Sample Order Card -->
+            <div class="order-card">
+                <div class="order-header">
+                    <h3>Order #12344</h3>
+                    <span class="order-status status-processing">Processing</span>
+                </div>
+                <div class="order-details">
+                    <p><strong>Design:</strong> Business Suit</p>
+                    <p><strong>Tailor:</strong> Elite Stitches</p>
+                    <p><strong>Order Date:</strong> March 10, 2024</p>
+                    <p><strong>Estimated Delivery:</strong> March 25, 2024</p>
+                    <p><strong>Price:</strong> $399.99</p>
+                </div>
+                <div class="order-actions">
+                    <button class="btn">View Details</button>
+                    <button class="btn">Track Order</button>
+                    <button class="btn">Contact Tailor</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <footer class="footer">
+        <nav class="footer-navbar">
+            <a href="index.html" class="footer-item"><i class="fas fa-home"></i><span>Home</span></a>
+            <a href="design.html" class="footer-item"><i class="fas fa-pencil-ruler"></i><span>Design</span></a>
+            <a href="measurements.html" class="footer-item active"><i class="fas fa-ruler"></i><span>Measurements</span></a>
+            <a href="tailors.html" class="footer-item"><i class="fas fa-user-tie"></i><span>Tailors</span></a>
+            <a href="orders.html" class="footer-item"><i class="fas fa-shopping-cart"></i><span>Orders</span></a>
+            <a href="accounts.html" class="footer-item"><i class="fas fa-user"></i><span>Profile</span></a>
+      </nav>
+     </footer>
+    <script>
+        // Toggle notifications dropdown
+        function toggleNotifications() {
+            const dropdown = document.getElementById('notificationDropdown');
+            dropdown.style.display = dropdown.style.display === 'block' ? 'none' : 'block';
+        }
+
+        // Close notifications when clicking outside
+        document.addEventListener('click', function(event) {
+            const dropdown = document.getElementById('notificationDropdown');
+            const bellIcon = document.querySelector('.fa-bell');
+            if (!bellIcon.contains(event.target) && !dropdown.contains(event.target)) {
+                dropdown.style.display = 'none';
+            }
+        });
+
+        // Handle file upload
+        document.getElementById('fileUpload').addEventListener('change', function(event) {
+            const file = event.target.files[0];
+            if (file) {
+                alert('Image uploaded successfully: ' + file.name);
+            }
+        });
+
+        // Handle search
+        function searchTailors() {
+            const searchTerm = document.getElementById('searchInput').value;
+            alert('Searching tailors or designs for: ' + searchTerm);
+        }
+
+        // Theme toggle functionality
+        const themeToggle = document.querySelector('.theme-toggle');
+        const body = document.body;
+        const themeIcon = themeToggle.querySelector('i');
+        
+        // Check for saved theme preference
+        const savedTheme = localStorage.getItem('theme');
+        if (savedTheme === 'dark') {
+            body.classList.add('dark-theme');
+            themeIcon.classList.remove('fa-moon');
+            themeIcon.classList.add('fa-sun');
+        }
+
+        function toggleTheme() {
+            body.classList.toggle('dark-theme');
+            themeIcon.classList.toggle('fa-moon');
+            themeIcon.classList.toggle('fa-sun');
+            
+            // Save theme preference
+            localStorage.setItem('theme', body.classList.contains('dark-theme') ? 'dark' : 'light');
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,1087 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TERA - Design Studio</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            background: #f5f5f5;
+            color: #333;
+            font-family: 'Orbitron', sans-serif;
+            transition: all 0.3s ease;
+        }
+        body.dark-theme {
+            background: #0d0d0d;
+            color: #fff;
+        }
+        .main-content {
+            padding: 20px;
+            margin-bottom: 70px;
+            margin-top: 20px;
+        }
+        .design-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: 1fr 300px;
+            gap: 20px;
+        }
+        .options-panel {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 20px;
+            padding: 20px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05);
+            backdrop-filter: blur(10px);
+            transition: all 0.3s ease;
+            height: fit-content;
+        }
+        .dark-theme .options-panel {
+            background: rgba(13, 13, 13, 0.95);
+        }
+        .section-title {
+            color: #00bcd4;
+            margin-bottom: 15px;
+            font-size: 1.2em;
+            text-shadow: 0 0 10px rgba(0, 188, 212, 0.2);
+        }
+        .dark-theme .section-title {
+            color: #00ffff;
+            text-shadow: 0 0 10px rgba(0, 255, 255, 0.2);
+        }
+        .clothing-type {
+            margin-bottom: 20px;
+        }
+        .clothing-options {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 10px;
+        }
+        .option-item {
+            background: rgba(255, 255, 255, 0.8);
+            padding: 15px;
+            border-radius: 15px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-align: center;
+            font-size: 14px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+            border: 1px solid rgba(0, 188, 212, 0.1);
+        }
+        .dark-theme .option-item {
+            background: rgba(255, 255, 255, 0.05);
+            border-color: rgba(0, 255, 255, 0.1);
+        }
+        .option-item:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(0, 188, 212, 0.15);
+        }
+        .option-item.active {
+            background: rgba(0, 188, 212, 0.1);
+            border: 1px solid #00bcd4;
+        }
+        .dark-theme .option-item.active {
+            background: rgba(0, 255, 255, 0.1);
+            border-color: #00ffff;
+        }
+        .color-palette {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(40px, 1fr));
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+        .color-option {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            cursor: pointer;
+            transition: 0.3s;
+            border: 2px solid transparent;
+            position: relative;
+        }
+        .color-option:hover {
+            transform: scale(1.1);
+            box-shadow: 0 0 10px rgba(0, 188, 212, 0.3);
+        }
+        .color-option.active {
+            border-color: #00bcd4;
+            box-shadow: 0 0 15px rgba(0, 188, 212, 0.4);
+        }
+        .dark-theme .color-option.active {
+            border-color: #00ffff;
+            box-shadow: 0 0 15px rgba(0, 255, 255, 0.4);
+        }
+        .design-canvas {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05);
+            backdrop-filter: blur(10px);
+            transition: all 0.3s ease;
+        }
+        .dark-theme .design-canvas {
+            background: rgba(13, 13, 13, 0.95);
+        }
+        .canvas-container {
+            position: relative;
+            width: 100%;
+            height: 800px;
+            background: #ffffff;
+            border-radius: 20px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05);
+            overflow: hidden;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        .dark-theme .canvas-container {
+            background: #1a1a1a;
+        }
+        #designCanvas {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            cursor: crosshair;
+            background: #ffffff;
+            z-index: 1;
+        }
+        .dark-theme #designCanvas {
+            background: #1a1a1a;
+        }
+        .canvas-tools {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            display: flex;
+            gap: 10px;
+            z-index: 100;
+            background: rgba(255, 255, 255, 0.95);
+            padding: 10px;
+            border-radius: 15px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+            backdrop-filter: blur(10px);
+        }
+        .tool-btn {
+            padding: 8px 15px;
+            border: none;
+            border-radius: 8px;
+            background: rgba(255, 255, 255, 0.9);
+            color: #333;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        .dark-theme .tool-btn {
+            background: rgba(13, 13, 13, 0.9);
+            color: #fff;
+        }
+        .tool-btn.active {
+            background: #00bcd4;
+            color: white;
+        }
+        .dark-theme .tool-btn.active {
+            background: #00ffff;
+        }
+        .tool-btn:hover {
+            transform: scale(1.05);
+            box-shadow: 0 0 10px rgba(0, 188, 212, 0.2);
+        }
+        .design-patterns {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+        .pattern-item {
+            background: rgba(255, 255, 255, 0.8);
+            padding: 15px;
+            border-radius: 15px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-align: center;
+            font-size: 12px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+            border: 1px solid rgba(0, 188, 212, 0.1);
+            position: relative;
+            overflow: hidden;
+        }
+        .pattern-item::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-size: 20px 20px;
+            opacity: 0.5;
+            transition: all 0.3s ease;
+        }
+        .pattern-item.floral::before {
+            background-image: url("data:image/svg+xml,%3Csvg width='20' height='20' viewBox='0 0 20 20' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M10,5 C12,5 14,7 14,9 C14,11 12,13 10,13 C8,13 6,11 6,9 C6,7 8,5 10,5' fill='%2300bcd4'/%3E%3C/svg%3E");
+        }
+        .pattern-item.geometric::before {
+            background-image: url("data:image/svg+xml,%3Csvg width='20' height='20' viewBox='0 0 20 20' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M5,5 L15,5 L15,15 L5,15 Z' fill='%2300bcd4'/%3E%3C/svg%3E");
+        }
+        .pattern-item.stripes::before {
+            background-image: url("data:image/svg+xml,%3Csvg width='20' height='20' viewBox='0 0 20 20' xmlns='http://www.w3.org/2000/svg'%3E%3Crect x='0' y='0' width='5' height='20' fill='%2300bcd4'/%3E%3C/svg%3E");
+        }
+        .pattern-item.dots::before {
+            background-image: url("data:image/svg+xml,%3Csvg width='20' height='20' viewBox='0 0 20 20' xmlns='http://www.w3.org/2000/svg'%3E%3Ccircle cx='10' cy='10' r='2' fill='%2300bcd4'/%3E%3C/svg%3E");
+        }
+        .pattern-item.embroidered::before {
+            background-image: url("data:image/svg+xml,%3Csvg width='20' height='20' viewBox='0 0 20 20' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M10,5 C12,5 14,7 14,9 C14,11 12,13 10,13 C8,13 6,11 6,9 C6,7 8,5 10,5' fill='%2300bcd4'/%3E%3C/svg%3E");
+        }
+        .pattern-item.active {
+            background: rgba(0, 188, 212, 0.1);
+            border: 1px solid #00bcd4;
+        }
+        .dark-theme .pattern-item.active {
+            background: rgba(0, 255, 255, 0.1);
+            border-color: #00ffff;
+        }
+        .save-btn {
+            position: absolute;
+            bottom: 20px;
+            right: 20px;
+            padding: 12px 25px;
+            border: none;
+            border-radius: 8px;
+            background: linear-gradient(90deg, #00bcd4, #00e5ff);
+            color: white;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            z-index: 100;
+            font-size: 16px;
+            font-weight: bold;
+        }
+        .dark-theme .save-btn {
+            background: linear-gradient(90deg, #00ffff, #00bcd4);
+        }
+        .save-btn:hover {
+            transform: scale(1.05);
+            box-shadow: 0 0 15px rgba(0, 188, 212, 0.3);
+        }
+        .footer-navbar {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.05);
+            display: flex;
+            justify-content: space-around;
+            padding: 10px 0;
+            color: #666;
+            z-index: 1000;
+            transition: all 0.3s ease;
+        }
+        .dark-theme .footer-navbar {
+            background: rgba(13, 13, 13, 0.95);
+        }
+        .footer-item {
+            text-align: center;
+            color: #666;
+            text-decoration: none;
+            font-size: 14px;
+            position: relative;
+            transition: all 0.3s ease;
+        }
+        .dark-theme .footer-item {
+            color: rgba(255, 255, 255, 0.7);
+        }
+        .footer-item i {
+            display: block;
+            font-size: 20px;
+            margin-bottom: 3px;
+            transition: all 0.3s ease;
+        }
+        .footer-item:hover {
+            color: #00bcd4;
+        }
+        .dark-theme .footer-item:hover {
+            color: #00ffff;
+        }
+        .footer-item.active {
+            color: #00bcd4;
+        }
+        .dark-theme .footer-item.active {
+            color: #00ffff;
+        }
+        .nav-icons {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+        .theme-toggle {
+            background: none;
+            border: none;
+            color: #00bcd4;
+            font-size: 22px;
+            cursor: pointer;
+            padding: 8px;
+            border-radius: 50%;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .dark-theme .theme-toggle {
+            color: #00ffff;
+        }
+        .theme-toggle:hover {
+            transform: scale(1.1) rotate(5deg);
+            background: rgba(0, 188, 212, 0.1);
+        }
+        .dark-theme .theme-toggle:hover {
+            background: rgba(0, 255, 255, 0.1);
+        }
+        .theme-toggle i {
+            transition: all 0.3s ease;
+        }
+        .theme-toggle:hover i {
+            transform: rotate(180deg);
+        }
+        .clothing-outline {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 90%;
+            height: 90%;
+            pointer-events: none;
+            opacity: 0.5;
+            transition: all 0.3s ease;
+        }
+        .dark-theme .clothing-outline {
+            opacity: 0.4;
+        }
+        .outline-controls {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            z-index: 100;
+            background: rgba(255, 255, 255, 0.95);
+            padding: 10px;
+            border-radius: 8px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        }
+        .dark-theme .outline-controls {
+            background: rgba(13, 13, 13, 0.95);
+        }
+        .outline-btn {
+            padding: 8px 15px;
+            border-radius: 8px;
+            border: 1px solid rgba(0, 188, 212, 0.2);
+            background: rgba(255, 255, 255, 0.8);
+            color: #333;
+            font-size: 14px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            width: 200px;
+            justify-content: space-between;
+        }
+        .outline-menu {
+            position: absolute;
+            top: 100%;
+            right: 0;
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 8px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+            padding: 10px;
+            display: none;
+            min-width: 200px;
+            z-index: 1000;
+            margin-top: 5px;
+        }
+        .outline-menu.show {
+            display: block;
+        }
+        .outline-option {
+            padding: 8px 15px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border-radius: 4px;
+            color: #333;
+            margin: 2px 0;
+        }
+        .outline-option:hover {
+            background: rgba(0, 188, 212, 0.1);
+            color: #00bcd4;
+        }
+        .dark-theme .outline-option:hover {
+            background: rgba(0, 255, 255, 0.1);
+            color: #00ffff;
+        }
+        .outline-category {
+            padding: 8px 15px;
+            color: #666;
+            font-size: 12px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            border-bottom: 1px solid rgba(0, 188, 212, 0.1);
+            margin-bottom: 5px;
+        }
+        .dark-theme .outline-category {
+            color: rgba(255, 255, 255, 0.6);
+        }
+        .size-control {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-left: 10px;
+        }
+        .size-control label {
+            color: #333;
+            font-size: 14px;
+        }
+        .dark-theme .size-control label {
+            color: #fff;
+        }
+        .size-slider {
+            width: 100px;
+            height: 4px;
+            -webkit-appearance: none;
+            background: #ddd;
+            border-radius: 2px;
+            outline: none;
+        }
+        .dark-theme .size-slider {
+            background: #444;
+        }
+        .size-slider::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            width: 16px;
+            height: 16px;
+            background: #00bcd4;
+            border-radius: 50%;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        .dark-theme .size-slider::-webkit-slider-thumb {
+            background: #00ffff;
+        }
+        .size-slider::-webkit-slider-thumb:hover {
+            transform: scale(1.1);
+        }
+        .size-value {
+            color: #333;
+            font-size: 12px;
+            min-width: 40px;
+        }
+        .dark-theme .size-value {
+            color: #fff;
+        }
+    </style>
+</head>
+<body>
+    <div class="main-content">
+        <div class="design-container">
+            <div class="canvas-container">
+                <div class="outline-controls">
+                    <button class="outline-btn" onclick="toggleOutlineMenu()">
+                        <i class="fas fa-tshirt"></i>
+                        <span id="selectedType">Select Design Type</span>
+                    </button>
+                    <div class="outline-menu" id="outlineMenu">
+                        <div class="outline-category">Men's Wear</div>
+                        <div class="outline-option" onclick="selectClothingType('suit')">Classic Suit</div>
+                        <div class="outline-option" onclick="selectClothingType('tuxedo')">Tuxedo</div>
+                        <div class="outline-option" onclick="selectClothingType('blazer')">Blazer</div>
+                        <div class="outline-option" onclick="selectClothingType('waistcoat')">Waistcoat</div>
+                        <div class="outline-option" onclick="selectClothingType('formal')">Formal Suit</div>
+                        <div class="outline-option" onclick="selectClothingType('shirt')">Shirt</div>
+                        <div class="outline-option" onclick="selectClothingType('kurta')">Kurta</div>
+                        <div class="outline-option" onclick="selectClothingType('sherwani')">Sherwani</div>
+                        <div class="outline-category">Women's Wear</div>
+                        <div class="outline-option" onclick="selectClothingType('dress')">Dress</div>
+                        <div class="outline-option" onclick="selectClothingType('sheath')">Sheath Dress</div>
+                        <div class="outline-option" onclick="selectClothingType('lehenga')">Lehenga</div>
+                        <div class="outline-option" onclick="selectClothingType('saree')">Saree</div>
+                        <div class="outline-option" onclick="selectClothingType('salwar')">Salwar</div>
+                        <div class="outline-option" onclick="selectClothingType('gown')">Gown</div>
+                        <div class="outline-option" onclick="selectClothingType('frock')">Frock</div>
+                        <div class="outline-option" onclick="selectClothingType('kurthi')">Kurthi</div>
+                        <div class="outline-option" onclick="selectClothingType('anarkali')">Anarkali</div>
+                    </div>
+                    <button class="outline-btn" onclick="showImageImportDialog()" style="margin-top: 10px;">
+                        <i class="fas fa-image"></i>
+                        <span>Import Image</span>
+                    </button>
+                </div>
+                <div class="canvas-tools">
+                    <button class="tool-btn active" onclick="setTool('draw')">Draw</button>
+                    <button class="tool-btn" onclick="setTool('fill')">Fill</button>
+                    <button class="tool-btn" onclick="setTool('eraser')">Eraser</button>
+                    <div class="size-control">
+                        <label>Size:</label>
+                        <input type="range" min="1" max="50" value="5" onchange="updateSize(this.value)" class="size-slider">
+                        <span class="size-value">5px</span>
+                    </div>
+                </div>
+                <canvas id="designCanvas"></canvas>
+            </div>
+            <div class="options-panel">
+                <h3 class="section-title">Fabric Type</h3>
+                <div class="clothing-type">
+                    <div class="clothing-options">
+                        <div class="option-item active">Silk</div>
+                        <div class="option-item">Cotton</div>
+                        <div class="option-item">Wool</div>
+                        <div class="option-item">Linen</div>
+                        <div class="option-item">Velvet</div>
+                        <div class="option-item">Chiffon</div>
+                    </div>
+                </div>
+
+                <h3 class="section-title">Style</h3>
+                <div class="clothing-options">
+                    <div class="option-item active">Traditional</div>
+                    <div class="option-item">Modern</div>
+                    <div class="option-item">Fusion</div>
+                    <div class="option-item">Casual</div>
+                </div>
+
+                <h3 class="section-title">Color</h3>
+                <div class="color-palette">
+                    <div class="color-option" style="background: #ff0000;"></div>
+                    <div class="color-option" style="background: #00ff00;"></div>
+                    <div class="color-option" style="background: #0000ff;"></div>
+                    <div class="color-option" style="background: #ffff00;"></div>
+                    <div class="color-option" style="background: #ff00ff;"></div>
+                    <div class="color-option" style="background: #00ffff;"></div>
+                    <div class="color-option" style="background: #ffffff;"></div>
+                    <div class="color-option" style="background: #000000;"></div>
+                    <div class="color-option" style="background: #ffa500;"></div>
+                    <div class="color-option" style="background: #800080;"></div>
+                </div>
+
+                <h3 class="section-title">Patterns</h3>
+                <div class="design-patterns">
+                    <div class="pattern-item">Floral</div>
+                    <div class="pattern-item">Geometric</div>
+                    <div class="pattern-item">Stripes</div>
+                    <div class="pattern-item">Dots</div>
+                    <div class="pattern-item">Solid</div>
+                    <div class="pattern-item">Embroidered</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <nav class="footer-navbar">
+        <a href="index.html" class="footer-item"><i class="fas fa-home"></i><span>Home</span></a>
+        <a href="design.html" class="footer-item active"><i class="fas fa-pencil-ruler"></i><span>Design</span></a>
+        <a href="measurements.html" class="footer-item"><i class="fas fa-ruler"></i><span>Measurements</span></a>
+        <a href="tailors.html" class="footer-item"><i class="fas fa-user-tie"></i><span>Tailors</span></a>
+        <a href="orders.html" class="footer-item"><i class="fas fa-shopping-cart"></i><span>Orders</span></a>
+        <a href="accounts.html" class="footer-item"><i class="fas fa-user"></i><span>Profile</span></a>
+    </nav>
+
+    <div id="imageImportDialog" style="display: none; position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); background: rgba(255, 255, 255, 0.95); padding: 20px; border-radius: 10px; box-shadow: 0 0 20px rgba(0, 0, 0, 0.2); z-index: 1000;">
+        <h3 style="margin-bottom: 15px;">Import Image</h3>
+        <input type="text" id="imageUrl" placeholder="Enter image URL" style="width: 100%; padding: 8px; margin-bottom: 10px; border: 1px solid #ddd; border-radius: 5px;">
+        <div style="display: flex; gap: 10px;">
+            <button onclick="importImage()" style="padding: 8px 15px; background: #00bcd4; color: white; border: none; border-radius: 5px; cursor: pointer;">Import</button>
+            <button onclick="closeImageImportDialog()" style="padding: 8px 15px; background: #ff4444; color: white; border: none; border-radius: 5px; cursor: pointer;">Cancel</button>
+        </div>
+    </div>
+
+    <script>
+        // Drawing variables
+        let isDrawing = false;
+        let currentTool = 'draw';
+        let currentColor = '#00bcd4';
+        let currentPattern = 'solid';
+        let currentSize = 5;
+        let lastX = 0;
+        let lastY = 0;
+        let currentFabric = 'silk';
+        let currentStyle = 'traditional';
+
+        // Initialize canvas
+        window.onload = function() {
+            initCanvas();
+            setupToolListeners();
+            setupColorListeners();
+            setupPatternListeners();
+            setupFabricListeners();
+            setupStyleListeners();
+        };
+
+        function initCanvas() {
+            const canvas = document.getElementById('designCanvas');
+            const ctx = canvas.getContext('2d');
+            
+            // Set canvas size to match container
+            const container = canvas.parentElement;
+            canvas.width = container.clientWidth;
+            canvas.height = container.clientHeight;
+            
+            // Set initial styles
+            ctx.strokeStyle = currentColor;
+            ctx.lineWidth = currentSize;
+            ctx.lineCap = 'round';
+            ctx.lineJoin = 'round';
+            
+            // Add event listeners
+            canvas.addEventListener('mousedown', startDrawing);
+            canvas.addEventListener('mousemove', draw);
+            canvas.addEventListener('mouseup', stopDrawing);
+            canvas.addEventListener('mouseout', stopDrawing);
+            
+            // Handle window resize
+            window.addEventListener('resize', () => {
+                canvas.width = container.clientWidth;
+                canvas.height = container.clientHeight;
+            });
+        }
+
+        function setupToolListeners() {
+            const tools = document.querySelectorAll('.tool-btn');
+            tools.forEach(tool => {
+                tool.addEventListener('click', () => {
+                    tools.forEach(t => t.classList.remove('active'));
+                    tool.classList.add('active');
+                    currentTool = tool.textContent.toLowerCase();
+                });
+            });
+        }
+
+        function setupColorListeners() {
+            const colors = document.querySelectorAll('.color-option');
+            colors.forEach(color => {
+                color.addEventListener('click', () => {
+                    colors.forEach(c => c.classList.remove('active'));
+                    color.classList.add('active');
+                    currentColor = color.style.background;
+                    
+                    // Update canvas color
+                    const ctx = document.getElementById('designCanvas').getContext('2d');
+                    ctx.strokeStyle = currentColor;
+                });
+            });
+        }
+
+        function setupPatternListeners() {
+            const patterns = document.querySelectorAll('.pattern-item');
+            patterns.forEach(pattern => {
+                pattern.addEventListener('click', () => {
+                    patterns.forEach(p => p.classList.remove('active'));
+                    pattern.classList.add('active');
+                    currentPattern = pattern.textContent.toLowerCase();
+                });
+            });
+        }
+
+        function setupFabricListeners() {
+            const fabricOptions = document.querySelectorAll('.clothing-type .option-item');
+            fabricOptions.forEach(option => {
+                option.addEventListener('click', () => {
+                    fabricOptions.forEach(opt => opt.classList.remove('active'));
+                    option.classList.add('active');
+                    currentFabric = option.textContent.toLowerCase();
+                    updateFabricTexture();
+                });
+            });
+        }
+
+        function setupStyleListeners() {
+            const styleOptions = document.querySelectorAll('.clothing-options .option-item');
+            styleOptions.forEach(option => {
+                option.addEventListener('click', () => {
+                    // Only update if it's a style option (not a fabric option)
+                    if (option.closest('.clothing-type') === null) {
+                        styleOptions.forEach(opt => opt.classList.remove('active'));
+                        option.classList.add('active');
+                        currentStyle = option.textContent.toLowerCase();
+                        updateStyle();
+                    }
+                });
+            });
+        }
+
+        function updateFabricTexture() {
+            const canvas = document.getElementById('designCanvas');
+            const ctx = canvas.getContext('2d');
+            
+            // Create a pattern based on the selected fabric
+            const patternCanvas = document.createElement('canvas');
+            patternCanvas.width = 20;
+            patternCanvas.height = 20;
+            const patternCtx = patternCanvas.getContext('2d');
+            
+            patternCtx.fillStyle = currentColor;
+            
+            switch(currentFabric) {
+                case 'silk':
+                    // Smooth, flowing pattern
+                    patternCtx.beginPath();
+                    patternCtx.moveTo(0, 10);
+                    patternCtx.quadraticCurveTo(10, 0, 20, 10);
+                    patternCtx.stroke();
+                    break;
+                case 'cotton':
+                    // Woven texture
+                    patternCtx.fillRect(0, 0, 5, 5);
+                    patternCtx.fillRect(10, 10, 5, 5);
+                    break;
+                case 'wool':
+                    // Knitted texture
+                    patternCtx.beginPath();
+                    patternCtx.arc(10, 10, 3, 0, Math.PI * 2);
+                    patternCtx.fill();
+                    break;
+                case 'linen':
+                    // Woven texture with lines
+                    patternCtx.fillRect(0, 0, 20, 1);
+                    patternCtx.fillRect(0, 10, 20, 1);
+                    break;
+                case 'velvet':
+                    // Velvet texture
+                    patternCtx.fillRect(0, 0, 20, 20);
+                    patternCtx.fillStyle = '#fff';
+                    patternCtx.fillRect(0, 0, 20, 1);
+                    break;
+                case 'chiffon':
+                    // Light, flowing texture
+                    patternCtx.beginPath();
+                    patternCtx.moveTo(0, 10);
+                    patternCtx.bezierCurveTo(5, 5, 15, 15, 20, 10);
+                    patternCtx.stroke();
+                    break;
+            }
+            
+            const pattern = ctx.createPattern(patternCanvas, 'repeat');
+            ctx.fillStyle = pattern;
+        }
+
+        function updateStyle() {
+            const canvas = document.getElementById('designCanvas');
+            const ctx = canvas.getContext('2d');
+            
+            // Adjust drawing style based on selected style
+            switch(currentStyle) {
+                case 'traditional':
+                    ctx.lineWidth = 3;
+                    ctx.lineCap = 'round';
+                    ctx.lineJoin = 'round';
+                    break;
+                case 'modern':
+                    ctx.lineWidth = 2;
+                    ctx.lineCap = 'square';
+                    ctx.lineJoin = 'miter';
+                    break;
+                case 'fusion':
+                    ctx.lineWidth = 2.5;
+                    ctx.lineCap = 'round';
+                    ctx.lineJoin = 'round';
+                    break;
+                case 'casual':
+                    ctx.lineWidth = 2;
+                    ctx.lineCap = 'round';
+                    ctx.lineJoin = 'round';
+                    break;
+            }
+        }
+
+        function setTool(tool) {
+            currentTool = tool;
+            const tools = document.querySelectorAll('.tool-btn');
+            tools.forEach(t => t.classList.remove('active'));
+            event.target.classList.add('active');
+        }
+
+        function startDrawing(e) {
+            if (currentTool === 'fill') {
+                floodFill(e.offsetX, e.offsetY);
+                return;
+            }
+            isDrawing = true;
+            [lastX, lastY] = [e.offsetX, e.offsetY];
+        }
+
+        function draw(e) {
+            if (!isDrawing) return;
+            
+            const canvas = document.getElementById('designCanvas');
+            const ctx = canvas.getContext('2d');
+            
+            ctx.beginPath();
+            ctx.moveTo(lastX, lastY);
+            ctx.lineTo(e.offsetX, e.offsetY);
+            
+            if (currentTool === 'eraser') {
+                ctx.strokeStyle = '#ffffff';
+                ctx.lineWidth = currentSize * 2;
+                ctx.stroke();
+            } else if (currentPattern !== 'solid') {
+                ctx.strokeStyle = currentColor;
+                ctx.lineWidth = currentSize;
+                ctx.stroke();
+                
+                // Apply pattern
+                const pattern = createPattern(ctx, currentPattern);
+                ctx.fillStyle = pattern;
+                ctx.fillRect(lastX - currentSize/2, lastY - currentSize/2, 
+                           e.offsetX - lastX + currentSize, 
+                           e.offsetY - lastY + currentSize);
+            } else {
+                ctx.strokeStyle = currentColor;
+                ctx.lineWidth = currentSize;
+                ctx.stroke();
+            }
+            
+            [lastX, lastY] = [e.offsetX, e.offsetY];
+        }
+
+        function createPattern(ctx, patternType) {
+            const patternCanvas = document.createElement('canvas');
+            patternCanvas.width = 20;
+            patternCanvas.height = 20;
+            const patternCtx = patternCanvas.getContext('2d');
+            
+            patternCtx.fillStyle = currentColor;
+            
+            switch(patternType) {
+                case 'floral':
+                    patternCtx.beginPath();
+                    patternCtx.arc(10, 10, 3, 0, Math.PI * 2);
+                    patternCtx.fill();
+                    break;
+                case 'geometric':
+                    patternCtx.fillRect(5, 5, 10, 10);
+                    break;
+                case 'stripes':
+                    patternCtx.fillRect(0, 0, 5, 20);
+                    break;
+                case 'dots':
+                    patternCtx.beginPath();
+                    patternCtx.arc(10, 10, 2, 0, Math.PI * 2);
+                    patternCtx.fill();
+                    break;
+                case 'embroidered':
+                    patternCtx.beginPath();
+                    patternCtx.arc(10, 10, 3, 0, Math.PI * 2);
+                    patternCtx.fill();
+                    patternCtx.beginPath();
+                    patternCtx.arc(10, 10, 1, 0, Math.PI * 2);
+                    patternCtx.fillStyle = '#fff';
+                    patternCtx.fill();
+                    break;
+            }
+            
+            return ctx.createPattern(patternCanvas, 'repeat');
+        }
+
+        function stopDrawing() {
+            isDrawing = false;
+        }
+
+        // Update outline functionality
+        function toggleOutlineMenu() {
+            const menu = document.getElementById('outlineMenu');
+            menu.classList.toggle('show');
+        }
+
+        function selectClothingType(type) {
+            // Update button text
+            const button = document.querySelector('.outline-btn');
+            button.innerHTML = `<i class="fas fa-tshirt"></i> ${type}`;
+            
+            // Close menu
+            const menu = document.getElementById('outlineMenu');
+            menu.classList.remove('show');
+            
+            // Define image paths for different clothing types
+            const imagePaths = {
+                // Men's Wear
+                'suit': 'C:/Users/jyoth/OneDrive/Pictures/Screenshots/Screenshot 2025-04-02 150121.png',
+                'tuxedo': 'C:/Users/jyoth/OneDrive/Pictures/Screenshots/Screenshot 2025-04-02 152212.png',
+                'blazer': 'C:/Users/jyoth/OneDrive/Pictures/Screenshots/Screenshot 2025-04-02 152401.png',
+                'waistcoat': 'C:/Users/jyoth/OneDrive/Pictures/Screenshots/Screenshot 2025-04-02 152618.png',
+                'pant': 'C:/Users/jyoth/OneDrive/Pictures/Screenshots/Screenshot 2025-04-02 152809.png',
+                'shirt': 'C:/Users/jyoth/OneDrive/Pictures/Screenshots/Screenshot 2025-04-02 153027.png',
+                'kurta': 'C:/Users/jyoth/OneDrive/Pictures/Screenshots/Screenshot 2025-04-02 153127.png',
+                'sherwani': 'C:/Users/jyoth/OneDrive/Pictures/Screenshots/Screenshot 2025-04-02 153233.png',
+                // Women's Wear
+                'dress': 'C:/Users/jyoth/OneDrive/Pictures/Screenshots/Screenshot 2025-04-02 153355.png',
+                'sheath': 'C:/Users/jyoth/OneDrive/Pictures/Screenshots/Screenshot 2025-04-02 155146.png',
+                'lehenga': 'C:/Users/jyoth/OneDrive/Pictures/Screenshots/Screenshot 2025-04-02 153727.png',
+                'saree': 'C:/Users/jyoth/OneDrive/Pictures/Screenshots/Screenshot 2025-04-02 153824.png',
+                'salwar': 'C:/Users/jyoth/OneDrive/Pictures/Screenshots/Screenshot 2025-04-02 154938.png',
+                'frock': 'C:/Users/jyoth/OneDrive/Pictures/Screenshots/Screenshot 2025-04-02 154126.png',
+                'kurthi': 'C:/Users/jyoth/OneDrive/Pictures/Screenshots/Screenshot 2025-04-02 154210.png',
+                'anarkali': 'C:/Users/jyoth/OneDrive/Pictures/Screenshots/Screenshot 2025-04-02 154251.png'
+            };
+
+            // Get the canvas and context
+            const canvas = document.getElementById('designCanvas');
+            const ctx = canvas.getContext('2d');
+            
+            // Clear the canvas
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            
+            // Create and load the image
+            const img = new Image();
+            
+            // Add error handling
+            img.onerror = function() {
+                console.error('Error loading image:', imagePaths[type]);
+                alert('Error loading image. Please check if the image exists at: ' + imagePaths[type]);
+            };
+            
+            // When image loads, draw it
+            img.onload = function() {
+                // Calculate size to fit 90% of canvas
+                const scale = Math.min(
+                    (canvas.width * 0.9) / img.width,
+                    (canvas.height * 0.9) / img.height
+                );
+                
+                const newWidth = img.width * scale;
+                const newHeight = img.height * scale;
+                
+                // Center the image
+                const x = (canvas.width - newWidth) / 2;
+                const y = (canvas.height - newHeight) / 2;
+                
+                // Draw the image
+                ctx.drawImage(img, x, y, newWidth, newHeight);
+            };
+            
+            // Set the image source
+            img.src = imagePaths[type];
+        }
+
+        function showImageImportDialog() {
+            document.getElementById('imageImportDialog').style.display = 'block';
+        }
+
+        function closeImageImportDialog() {
+            document.getElementById('imageImportDialog').style.display = 'none';
+        }
+
+        function importImage() {
+            const imageUrl = document.getElementById('imageUrl').value;
+            if (!imageUrl) {
+                alert('Please enter an image URL');
+                return;
+            }
+
+            const canvas = document.getElementById('designCanvas');
+            const ctx = canvas.getContext('2d');
+            const img = new Image();
+
+            img.onload = function() {
+                // Clear canvas
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+                // Calculate dimensions to fit the image while maintaining aspect ratio
+                const scale = Math.min(
+                    canvas.width / img.width,
+                    canvas.height / img.height
+                ) * 0.8; // 80% of the maximum size
+
+                const newWidth = img.width * scale;
+                const newHeight = img.height * scale;
+
+                // Center the image
+                const x = (canvas.width - newWidth) / 2;
+                const y = (canvas.height - newHeight) / 2;
+
+                // Draw the image
+                ctx.drawImage(img, x, y, newWidth, newHeight);
+            };
+
+            img.onerror = function() {
+                alert('Error loading image. Please check the URL and try again.');
+            };
+
+            img.src = imageUrl;
+            closeImageImportDialog();
+        }
+
+        function floodFill(startX, startY) {
+            const canvas = document.getElementById('designCanvas');
+            const ctx = canvas.getContext('2d');
+            const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+            const pixels = imageData.data;
+            
+            // Get the color at the clicked point
+            const startPos = (startY * canvas.width + startX) * 4;
+            const startR = pixels[startPos];
+            const startG = pixels[startPos + 1];
+            const startB = pixels[startPos + 2];
+            
+            // Convert current color to RGB
+            const fillColor = hexToRgb(currentColor);
+            
+            // Create a stack for the flood fill algorithm
+            const stack = [[startX, startY]];
+            
+            while (stack.length > 0) {
+                const [x, y] = stack.pop();
+                const pos = (y * canvas.width + x) * 4;
+                
+                // Check if the pixel is within bounds and matches the target color
+                if (x < 0 || x >= canvas.width || y < 0 || y >= canvas.height) continue;
+                if (pixels[pos] !== startR || pixels[pos + 1] !== startG || pixels[pos + 2] !== startB) continue;
+                
+                // Set the new color
+                pixels[pos] = fillColor.r;
+                pixels[pos + 1] = fillColor.g;
+                pixels[pos + 2] = fillColor.b;
+                
+                // Add neighboring pixels to the stack
+                stack.push([x + 1, y], [x - 1, y], [x, y + 1], [x, y - 1]);
+            }
+            
+            // Update the canvas with the new image data
+            ctx.putImageData(imageData, 0, 0);
+        }
+
+        function hexToRgb(hex) {
+            const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
+            return result ? {
+                r: parseInt(result[1], 16),
+                g: parseInt(result[2], 16),
+                b: parseInt(result[3], 16)
+            } : null;
+        }
+
+        // Save design functionality
+        document.querySelector('.save-btn').addEventListener('click', function() {
+            const canvas = document.getElementById('designCanvas');
+            const dataURL = canvas.toDataURL('image/png');
+            
+            // Create download link
+            const link = document.createElement('a');
+            link.download = 'design.png';
+            link.href = dataURL;
+            link.click();
+            
+            alert('Design saved successfully!');
+        });
+
+        function updateSize(value) {
+            currentSize = parseInt(value);
+            document.querySelector('.size-value').textContent = value + 'px';
+            
+            const canvas = document.getElementById('designCanvas');
+            const ctx = canvas.getContext('2d');
+            ctx.lineWidth = currentSize;
+        }
+    </script>
+</body>
+</html>
